@@ -34,17 +34,17 @@ const BusinessDetailPage: React.FC = () => {
 
   const fetchBusinessDetails = async () => {
     try {
-      const [businessResponse, reviewsResponse] = await Promise.all([
+      const [businessResponse, reviewsResponse] :any = await Promise.all([
         apiService.getBusiness(Number(id)),
         apiService.getBusinessReviews(Number(id)),
       ]);
       
       console.log('Business response:', businessResponse);
-      console.log('Reviews response:', reviewsResponse);
+      console.log('Reviews response:', reviewsResponse.data.content);
       
       // Handle direct response structure
-      setBusiness(businessResponse);
-      setReviews(Array.isArray(reviewsResponse) ? reviewsResponse : []);
+      setBusiness(businessResponse.data);
+      setReviews(Array.isArray(reviewsResponse.data.content) ? reviewsResponse.data.content : []);
     } catch (error) {
       console.error('Error fetching business details:', error);
       toast({
@@ -185,7 +185,7 @@ const BusinessDetailPage: React.FC = () => {
                   <StarRating
                     rating={newReview.rating}
                     onRatingChange={(rating) => setNewReview({ ...newReview, rating })}
-                    interactive
+                    //? interactive
                   />
                 </div>
                 <div>
@@ -224,7 +224,7 @@ const BusinessDetailPage: React.FC = () => {
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <p className="font-semibold">
-                            {review.userFirstName} {review.userLastName}
+                            {review.user.name} 
                           </p>
                           <StarRating rating={review.rating} />
                         </div>

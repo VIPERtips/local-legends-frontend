@@ -22,7 +22,8 @@ const TopRatedPage: React.FC = () => {
     setLoading(true);
     try {
       const data = await apiService.getTopRatedBusinesses(category);
-      setBusinesses(data);
+      console.log("Top rated businesses response:", data.content);
+      setBusinesses(data?.content);
     } catch (error) {
       toast({
         title: "Error",
@@ -39,9 +40,10 @@ const TopRatedPage: React.FC = () => {
   }, []);
 
   const handleCategoryChange = (value: string) => {
-    setSelectedCategory(value);
-    fetchTopRatedBusinesses(value || undefined);
-  };
+  setSelectedCategory(value === "all" ? "" : value);
+  fetchTopRatedBusinesses(value === "all" ? undefined : value);
+};
+
 
   return (
     <div className="min-h-screen bg-appBg py-8">
@@ -57,8 +59,8 @@ const TopRatedPage: React.FC = () => {
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
-                  {categories.map((category) => (
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((category ) => (
                     <SelectItem key={category} value={category}>
                       {category}
                     </SelectItem>

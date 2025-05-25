@@ -16,6 +16,7 @@ import AddBusinessPage from "./pages/AddBusinessPage";
 import TopRatedPage from "./pages/TopRatedPage";
 import AdminClaimsPage from "./pages/AdminClaimsPage";
 import NotFound from "./pages/NotFound";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -24,9 +25,11 @@ const App = () => (
     <TooltipProvider>
       <AuthProvider>
         <BrowserRouter>
+         <ScrollToTop/>
           <div className="min-h-screen bg-appBg">
             <Navbar />
             <Routes>
+             
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />

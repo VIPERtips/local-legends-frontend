@@ -34,7 +34,7 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
               </span>
             </div>
             <span className="text-sm font-semibold text-primary">
-              {business.averageRating.toFixed(1)}
+              {business.averageRating}
             </span>
           </div>
         </div>

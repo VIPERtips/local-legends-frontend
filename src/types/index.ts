@@ -24,9 +24,13 @@ export interface Business {
   reviewCount: number;
   createdAt: string;
   updatedAt: string;
+  
 }
 
 export interface Review {
+  user: {
+    name:string;
+  };
   id: number;
   businessId: number;
   userId: number;
@@ -55,6 +59,7 @@ export interface AuthState {
 }
 
 export interface PaginatedResponse<T> {
+  data: any;
   content: T[];
   totalElements: number;
   totalPages: number;

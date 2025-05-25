@@ -73,6 +73,7 @@ const RegisterPage: React.FC = () => {
       });
       navigate('/businesses');
     } catch (error) {
+      
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Registration failed",

@@ -43,7 +43,7 @@ const BusinessListPage: React.FC = () => {
       console.log("API response:", response);
       
       // Handle direct response structure
-      const businessData = response.content || [];
+      const businessData = response.data.content || [];
       const totalPagesCount = response.totalPages || 0;
       
       setBusinesses(Array.isArray(businessData) ? businessData : []);

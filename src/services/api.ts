@@ -38,7 +38,9 @@ class ApiService {
   async login(credentials: {
     email: string;
     password: string;
-  }): Promise<{ user: User; token: string }> {
+  }): Promise<{
+    data: { user: any; token: any; }; user: User; token: string 
+}> {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
@@ -110,7 +112,7 @@ class ApiService {
 
   // Review endpoints
   async getBusinessReviews(businessId: number): Promise<Review[]> {
-    const response = await fetch(`${API_BASE_URL}/business/${businessId}/reviews`, {
+    const response = await fetch(`${API_BASE_URL}/reviews/business/${businessId}`, {
       headers: this.getAuthHeaders(),
     });
     return this.handleResponse(response);
@@ -120,7 +122,7 @@ class ApiService {
     rating: number;
     comment?: string;
   }): Promise<Review> {
-    const response = await fetch(`${API_BASE_URL}/business/${businessId}/reviews`, {
+    const response = await fetch(`${API_BASE_URL}/reviews/add/${businessId}`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(reviewData),
@@ -130,7 +132,7 @@ class ApiService {
 
   // Business claim endpoints
   async submitClaim(businessId: number, evidence: string): Promise<BusinessClaim> {
-    const response = await fetch(`${API_BASE_URL}/business/${businessId}/claim`, {
+    const response = await fetch(`${API_BASE_URL}/claims/${businessId}`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ evidence }),
@@ -139,14 +141,14 @@ class ApiService {
   }
 
   async getClaims(): Promise<BusinessClaim[]> {
-    const response = await fetch(`${API_BASE_URL}/admin/claims`, {
+    const response = await fetch(`${API_BASE_URL}/claims`, {
       headers: this.getAuthHeaders(),
     });
     return this.handleResponse(response);
   }
 
   async updateClaimStatus(claimId: number, status: 'APPROVED' | 'REJECTED'): Promise<BusinessClaim> {
-    const response = await fetch(`${API_BASE_URL}/admin/claims/${claimId}`, {
+    const response = await fetch(`${API_BASE_URL}/claims/${claimId}/status`, {
       method: 'PUT',
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ status }),
