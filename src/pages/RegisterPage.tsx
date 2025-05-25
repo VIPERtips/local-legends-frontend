@@ -65,6 +65,7 @@ const RegisterPage: React.FC = () => {
         lastName: formData.lastName,
         email: formData.email,
         password: formData.password,
+        confirmPassword: formData.confirmPassword
       });
       toast({
         title: "Success",

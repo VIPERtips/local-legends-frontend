@@ -41,7 +41,7 @@ const Navbar: React.FC = () => {
                   </Link>
                 )}
                 <span className="text-appText">
-                  Hello, {user?.firstName}
+                  Hello, {user?.name}
                 </span>
                 <Button onClick={handleLogout} variant="outline" size="sm">
                   Logout

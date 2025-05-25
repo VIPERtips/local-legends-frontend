@@ -40,7 +40,7 @@ const BusinessDetailPage: React.FC = () => {
         apiService.getBusiness(Number(id)),
         apiService.getBusinessReviews(Number(id)),
       ]);
-      
+      console.log(businessData)
       setBusiness(businessData);
       setReviews(reviewsData);
     } catch (error) {

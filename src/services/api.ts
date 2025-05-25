@@ -50,7 +50,7 @@ class ApiService {
   // Business endpoints
   async getBusinesses(page = 0, size = 10): Promise<PaginatedResponse<Business>> {
     const response = await fetch(
-      `${API_BASE_URL}/businesses?page=${page}&size=${size}`,
+      `${API_BASE_URL}/business?page=${page}&size=${size}`,
       {
         headers: this.getAuthHeaders(),
       }
@@ -59,7 +59,7 @@ class ApiService {
   }
 
   async getBusiness(id: number): Promise<Business> {
-    const response = await fetch(`${API_BASE_URL}/businesses/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/business/${id}`, {
       headers: this.getAuthHeaders(),
     });
     return this.handleResponse(response);
@@ -80,7 +80,7 @@ class ApiService {
     queryParams.append('size', (params.size || 10).toString());
 
     const response = await fetch(
-      `${API_BASE_URL}/businesses/search?${queryParams}`,
+      `${API_BASE_URL}/business/search?${queryParams}`,
       {
         headers: this.getAuthHeaders(),
       }
@@ -89,7 +89,7 @@ class ApiService {
   }
 
   async createBusiness(businessData: Omit<Business, 'id' | 'averageRating' | 'reviewCount' | 'createdAt' | 'updatedAt'>): Promise<Business> {
-    const response = await fetch(`${API_BASE_URL}/businesses`, {
+    const response = await fetch(`${API_BASE_URL}/business`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(businessData),
@@ -99,8 +99,8 @@ class ApiService {
 
   async getTopRatedBusinesses(category?: string): Promise<Business[]> {
     const url = category 
-      ? `${API_BASE_URL}/businesses/top-rated?category=${category}`
-      : `${API_BASE_URL}/businesses/top-rated`;
+      ? `${API_BASE_URL}/business/top-rated?category=${category}`
+      : `${API_BASE_URL}/business/top-rated`;
     
     const response = await fetch(url, {
       headers: this.getAuthHeaders(),
@@ -110,7 +110,7 @@ class ApiService {
 
   // Review endpoints
   async getBusinessReviews(businessId: number): Promise<Review[]> {
-    const response = await fetch(`${API_BASE_URL}/businesses/${businessId}/reviews`, {
+    const response = await fetch(`${API_BASE_URL}/business/${businessId}/reviews`, {
       headers: this.getAuthHeaders(),
     });
     return this.handleResponse(response);
@@ -120,7 +120,7 @@ class ApiService {
     rating: number;
     comment?: string;
   }): Promise<Review> {
-    const response = await fetch(`${API_BASE_URL}/businesses/${businessId}/reviews`, {
+    const response = await fetch(`${API_BASE_URL}/business/${businessId}/reviews`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(reviewData),
@@ -130,7 +130,7 @@ class ApiService {
 
   // Business claim endpoints
   async submitClaim(businessId: number, evidence: string): Promise<BusinessClaim> {
-    const response = await fetch(`${API_BASE_URL}/businesses/${businessId}/claim`, {
+    const response = await fetch(`${API_BASE_URL}/business/${businessId}/claim`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ evidence }),

@@ -41,8 +41,10 @@ const BusinessListPage: React.FC = () => {
         response = await apiService.getBusinesses(page, 12);
       }
       
-      setBusinesses(response.content);
-      setTotalPages(response.totalPages);
+      setBusinesses(response && Array.isArray(response.data.content) ? response.data.content : []);
+      console.log("myresponse",response)
+      setTotalPages(response.data.totalPages);
+      console.log(response.data.totalPages ," pages")
       setCurrentPage(page);
     } catch (error) {
       toast({

@@ -15,6 +15,7 @@ interface AuthContextType extends AuthState {
     password: string;
     firstName: string;
     lastName: string;
+    confirmPassword: string;
   }) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
@@ -78,8 +79,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'SET_LOADING', payload: true });
     try {
       const response = await apiService.login({ email, password });
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
       dispatch({ type: 'LOGIN_SUCCESS', payload: response });
     } catch (error) {
       dispatch({ type: 'SET_LOADING', payload: false });
@@ -96,8 +97,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'SET_LOADING', payload: true });
     try {
       const response = await apiService.register(userData);
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
       dispatch({ type: 'LOGIN_SUCCESS', payload: response });
     } catch (error) {
       dispatch({ type: 'SET_LOADING', payload: false });
