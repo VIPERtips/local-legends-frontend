@@ -15,6 +15,7 @@ import BusinessDetailPage from "./pages/BusinessDetailPage";
 import AddBusinessPage from "./pages/AddBusinessPage";
 import TopRatedPage from "./pages/TopRatedPage";
 import AdminClaimsPage from "./pages/AdminClaimsPage";
+import AdminBusinessesPage from "./pages/AdminBusinessesPage";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -70,6 +71,14 @@ const App = () => (
                 element={
                   <ProtectedRoute adminOnly>
                     <AdminClaimsPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/businesses/:id" 
+                element={
+                  <ProtectedRoute adminOnly>
+                    <AdminBusinessesPage />
                   </ProtectedRoute>
                 } 
               />
