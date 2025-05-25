@@ -36,14 +36,22 @@ const BusinessDetailPage: React.FC = () => {
 
   const fetchBusinessDetails = async () => {
     try {
-      const [businessData, reviewsData] = await Promise.all([
+      const [businessResponse, reviewsResponse] = await Promise.all([
         apiService.getBusiness(Number(id)),
         apiService.getBusinessReviews(Number(id)),
       ]);
-      console.log(businessData)
+      
+      console.log('Business response:', businessResponse);
+      console.log('Reviews response:', reviewsResponse);
+      
+      // Handle the response structure - check if data is nested or direct
+      const businessData = businessResponse.data || businessResponse;
+      const reviewsData = reviewsResponse.data || reviewsResponse;
+      
       setBusiness(businessData);
-      setReviews(reviewsData);
+      setReviews(Array.isArray(reviewsData) ? reviewsData : []);
     } catch (error) {
+      console.error('Error fetching business details:', error);
       toast({
         title: "Error",
         description: "Failed to load business details",

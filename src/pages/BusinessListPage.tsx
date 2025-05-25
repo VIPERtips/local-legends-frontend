@@ -41,12 +41,20 @@ const BusinessListPage: React.FC = () => {
         response = await apiService.getBusinesses(page, 12);
       }
       
-      setBusinesses(response && Array.isArray(response.data.content) ? response.data.content : []);
-      console.log("myresponse",response)
-      setTotalPages(response.data.totalPages);
-      console.log(response.data.totalPages ," pages")
+      console.log("API response:", response);
+      
+      // Handle the response structure correctly
+      const businessData = response.content || response.data?.content || [];
+      const totalPagesCount = response.totalPages || response.data?.totalPages || 0;
+      
+      setBusinesses(Array.isArray(businessData) ? businessData : []);
+      setTotalPages(totalPagesCount);
       setCurrentPage(page);
+      
+      console.log("Businesses set:", businessData);
+      console.log("Total pages:", totalPagesCount);
     } catch (error) {
+      console.error("Error fetching businesses:", error);
       toast({
         title: "Error",
         description: "Failed to load businesses",

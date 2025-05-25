@@ -56,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user: null,
     token: null,
     isAuthenticated: false,
-    isLoading: false,
+    isLoading: true,
   });
 
   useEffect(() => {
@@ -66,12 +66,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (token && userData) {
       try {
         const user = JSON.parse(userData);
+        console.log('Restoring user session:', { user, token });
         dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token } });
       } catch (error) {
         console.error('Error parsing stored user data:', error);
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        dispatch({ type: 'SET_LOADING', payload: false });
       }
+    } else {
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
   }, []);
 
@@ -79,9 +83,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'SET_LOADING', payload: true });
     try {
       const response = await apiService.login({ email, password });
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      dispatch({ type: 'LOGIN_SUCCESS', payload: response });
+      console.log('Login response:', response);
+      
+      // Extract data from response.data since that's what the API returns
+      const { user, token } = response.data;
+      
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token } });
     } catch (error) {
       dispatch({ type: 'SET_LOADING', payload: false });
       throw error;
@@ -97,9 +106,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'SET_LOADING', payload: true });
     try {
       const response = await apiService.register(userData);
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      dispatch({ type: 'LOGIN_SUCCESS', payload: response });
+      console.log('Register response:', response);
+      
+      // Extract data from response.data since that's what the API returns
+      const { user, token } = response.data;
+      
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token } });
     } catch (error) {
       dispatch({ type: 'SET_LOADING', payload: false });
       throw error;
