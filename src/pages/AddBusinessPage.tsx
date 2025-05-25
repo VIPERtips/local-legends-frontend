@@ -8,7 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import LoadingSpinner from '../components/LoadingSpinner';
+import LocationSelector from '../components/LocationSelector';
 import { useToast } from '@/hooks/use-toast';
 
 const AddBusinessPage: React.FC = () => {
@@ -25,6 +27,7 @@ const AddBusinessPage: React.FC = () => {
     website: '',
   });
   const [submitting, setSubmitting] = useState(false);
+  const [locationSelected, setLocationSelected] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -44,6 +47,28 @@ const AddBusinessPage: React.FC = () => {
     setFormData({
       ...formData,
       category: value,
+    });
+  };
+
+  const handleLocationSelect = (location: {
+    lat: number;
+    lng: number;
+    address: string;
+    city: string;
+    state: string;
+    zipCode: string;
+  }) => {
+    setFormData({
+      ...formData,
+      address: location.address,
+      city: location.city,
+      state: location.state,
+      zipCode: location.zipCode,
+    });
+    setLocationSelected(true);
+    toast({
+      title: "Location Selected",
+      description: "Business location has been set successfully!",
     });
   };
 
@@ -82,7 +107,7 @@ const AddBusinessPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-appBg py-8">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl text-appText">Add Your Business</CardTitle>
@@ -91,167 +116,129 @@ const AddBusinessPage: React.FC = () => {
             </p>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Basic Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-appText">Basic Information</h3>
-                
-                <div>
-                  <Label htmlFor="name">Business Name *</Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder="Enter business name"
-                    required
-                  />
-                </div>
+            <Tabs defaultValue="basic" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="basic">Basic Info</TabsTrigger>
+                <TabsTrigger value="location">Location</TabsTrigger>
+                <TabsTrigger value="contact">Contact</TabsTrigger>
+              </TabsList>
 
-                <div>
-                  <Label htmlFor="description">Description *</Label>
-                  <Textarea
-                    id="description"
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    placeholder="Describe your business..."
-                    rows={4}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="category">Category *</Label>
-                  <Select value={formData.category} onValueChange={handleCategoryChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Location Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-appText">Location</h3>
-                
-                <div>
-                  <Label htmlFor="address">Address *</Label>
-                  <Input
-                    id="address"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    placeholder="Street address"
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <form onSubmit={handleSubmit} className="mt-6">
+                <TabsContent value="basic" className="space-y-4">
                   <div>
-                    <Label htmlFor="city">City *</Label>
+                    <Label htmlFor="name">Business Name *</Label>
                     <Input
-                      id="city"
-                      name="city"
-                      value={formData.city}
+                      id="name"
+                      name="name"
+                      value={formData.name}
                       onChange={handleInputChange}
-                      placeholder="City"
+                      placeholder="Enter business name"
                       required
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="state">State *</Label>
-                    <Input
-                      id="state"
-                      name="state"
-                      value={formData.state}
-                      onChange={handleInputChange}
-                      placeholder="State"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="zipCode">ZIP Code *</Label>
-                    <Input
-                      id="zipCode"
-                      name="zipCode"
-                      value={formData.zipCode}
-                      onChange={handleInputChange}
-                      placeholder="ZIP Code"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
 
-              {/* Contact Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-appText">Contact Information</h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="phone">Phone *</Label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      value={formData.phone}
+                    <Label htmlFor="description">Description *</Label>
+                    <Textarea
+                      id="description"
+                      name="description"
+                      value={formData.description}
                       onChange={handleInputChange}
-                      placeholder="Phone number"
+                      placeholder="Describe your business..."
+                      rows={4}
                       required
                     />
                   </div>
+
                   <div>
-                    <Label htmlFor="email">Email *</Label>
+                    <Label htmlFor="category">Category *</Label>
+                    <Select value={formData.category} onValueChange={handleCategoryChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="location" className="space-y-4">
+                  <LocationSelector onLocationSelect={handleLocationSelect} />
+                  
+                  {locationSelected && (
+                    <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <h4 className="font-semibold text-green-800 mb-2">Selected Location:</h4>
+                      <p className="text-green-700">
+                        {formData.address}, {formData.city}, {formData.state} {formData.zipCode}
+                      </p>
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="contact" className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="phone">Phone *</Label>
+                      <Input
+                        id="phone"
+                        name="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        placeholder="Phone number"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="email">Email *</Label>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        placeholder="Business email"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="website">Website</Label>
                     <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
+                      id="website"
+                      name="website"
+                      type="url"
+                      value={formData.website}
                       onChange={handleInputChange}
-                      placeholder="Business email"
-                      required
+                      placeholder="https://yourwebsite.com"
                     />
                   </div>
-                </div>
 
-                <div>
-                  <Label htmlFor="website">Website</Label>
-                  <Input
-                    id="website"
-                    name="website"
-                    type="url"
-                    value={formData.website}
-                    onChange={handleInputChange}
-                    placeholder="https://yourwebsite.com"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-4 pt-6">
-                <Button 
-                  type="button" 
-                  variant="outline"
-                  onClick={() => navigate('/businesses')}
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  type="submit" 
-                  disabled={submitting}
-                  className="bg-primary hover:bg-primary/90"
-                >
-                  {submitting ? <LoadingSpinner size="sm" /> : 'Add Business'}
-                </Button>
-              </div>
-            </form>
+                  <div className="flex justify-end space-x-4 pt-6">
+                    <Button 
+                      type="button" 
+                      variant="outline"
+                      onClick={() => navigate('/businesses')}
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      disabled={submitting}
+                      className="bg-primary hover:bg-primary/90"
+                    >
+                      {submitting ? <LoadingSpinner size="sm" /> : 'Add Business'}
+                    </Button>
+                  </div>
+                </TabsContent>
+              </form>
+            </Tabs>
           </CardContent>
         </Card>
       </div>

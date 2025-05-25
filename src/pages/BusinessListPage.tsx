@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { apiService } from '../services/api';
 import { Business, PaginatedResponse } from '../types';
@@ -43,9 +42,9 @@ const BusinessListPage: React.FC = () => {
       
       console.log("API response:", response);
       
-      // Handle the response structure correctly
-      const businessData = response.content || response.data?.content || [];
-      const totalPagesCount = response.totalPages || response.data?.totalPages || 0;
+      // Handle direct response structure
+      const businessData = response.content || [];
+      const totalPagesCount = response.totalPages || 0;
       
       setBusinesses(Array.isArray(businessData) ? businessData : []);
       setTotalPages(totalPagesCount);

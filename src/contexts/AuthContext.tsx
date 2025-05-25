@@ -85,8 +85,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await apiService.login({ email, password });
       console.log('Login response:', response);
       
-      // Extract data from response.data since that's what the API returns
-      const { user, token } = response.data;
+      // Handle direct response structure
+      const { user, token } = response;
       
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
@@ -108,8 +108,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await apiService.register(userData);
       console.log('Register response:', response);
       
-      // Extract data from response.data since that's what the API returns
-      const { user, token } = response.data;
+      // Handle direct response structure
+      const { user, token } = response;
       
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
