@@ -62,7 +62,7 @@ npm install
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173`
+The application will be available at `http://localhost:8081`
 
 ### Backend Setup
 This frontend connects to a Spring Boot backend. Ensure your backend is running and accessible at the configured API endpoint.
@@ -116,21 +116,8 @@ src/
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
 
-## 🌐 Deployment
 
-### Lovable Platform (Recommended)
-1. Visit [Lovable Project](https://lovable.dev/projects/8c9c64d3-ce0a-4a14-8740-9025ac4d0aab)
-2. Click Share → Publish
-3. Your app will be deployed instantly
 
-### Custom Domain
-Connect your own domain through Project → Settings → Domains in Lovable.
-
-### Manual Deployment
-```bash
-npm run build
-# Deploy the dist/ folder to your hosting provider
-```
 
 ## 🤝 Contributing
 
@@ -163,9 +150,5 @@ For support and questions:
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
-
-**Live Demo**: [https://8c9c64d3-ce0a-4a14-8740-9025ac4d0aab.lovableproject.com](https://8c9c64d3-ce0a-4a14-8740-9025ac4d0aab.lovableproject.com)
-
-**Project URL**: [https://lovable.dev/projects/8c9c64d3-ce0a-4a14-8740-9025ac4d0aab](https://lovable.dev/projects/8c9c64d3-ce0a-4a14-8740-9025ac4d0aab)
 
 Made with ❤️ for local communities
