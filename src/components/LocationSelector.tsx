@@ -152,24 +152,25 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
     }
   }, [initialLocation]);
 
+  const mapCenter = position ? [position.lat, position.lng] : [37.7749, -122.4194];
+
   return (
-    <Card className="w-full">
-      <CardHeader>
+    <Card className="w-full bg-gradient-to-br from-purple-50 to-blue-50 border-0 shadow-xl">
+      <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-t-lg">
         <CardTitle className="flex items-center space-x-2">
           <MapPin className="h-5 w-5" />
           <span>Select Business Location</span>
         </CardTitle>
-        <p className="text-sm text-gray-600">
+        <p className="text-purple-100 text-sm">
           Click on the map to set your business location, or use your current location.
         </p>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex space-x-2">
+      <CardContent className="space-y-6 p-6">
+        <div className="flex space-x-3">
           <Button
             type="button"
             onClick={getCurrentLocation}
-            variant="outline"
-            className="flex items-center space-x-2"
+            className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
           >
             <Locate className="h-4 w-4" />
             <span>Use Current Location</span>
@@ -178,21 +179,22 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
             type="button"
             onClick={() => setManualEdit(!manualEdit)}
             variant="outline"
+            className="border-2 border-purple-200 hover:border-purple-400"
           >
             {manualEdit ? 'Use Map' : 'Manual Entry'}
           </Button>
         </div>
 
         {!manualEdit && (
-          <div className="h-64 w-full rounded-lg overflow-hidden border">
+          <div className="h-64 w-full rounded-xl overflow-hidden border-2 border-purple-200 shadow-lg">
             <MapContainer
-              center={position || [37.7749, -122.4194]}
+              center={mapCenter as [number, number]}
               zoom={13}
               style={{ height: '100%', width: '100%' }}
             >
               <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               />
               <LocationMarker position={position} onPositionChange={handleMapClick} />
             </MapContainer>
@@ -202,44 +204,48 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         {/* Address Form */}
         <div className="grid grid-cols-1 gap-4">
           <div>
-            <Label htmlFor="address">Street Address *</Label>
+            <Label htmlFor="address" className="text-gray-700 font-medium">Street Address *</Label>
             <Input
               id="address"
               value={locationData.address}
               onChange={(e) => handleInputChange('address', e.target.value)}
               placeholder="Enter street address"
+              className="border-2 border-purple-200 focus:border-purple-400 rounded-lg"
               required
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="city">City *</Label>
+              <Label htmlFor="city" className="text-gray-700 font-medium">City *</Label>
               <Input
                 id="city"
                 value={locationData.city}
                 onChange={(e) => handleInputChange('city', e.target.value)}
                 placeholder="City"
+                className="border-2 border-purple-200 focus:border-purple-400 rounded-lg"
                 required
               />
             </div>
             <div>
-              <Label htmlFor="state">State *</Label>
+              <Label htmlFor="state" className="text-gray-700 font-medium">State *</Label>
               <Input
                 id="state"
                 value={locationData.state}
                 onChange={(e) => handleInputChange('state', e.target.value)}
                 placeholder="State"
+                className="border-2 border-purple-200 focus:border-purple-400 rounded-lg"
                 required
               />
             </div>
             <div>
-              <Label htmlFor="zipCode">ZIP Code *</Label>
+              <Label htmlFor="zipCode" className="text-gray-700 font-medium">ZIP Code *</Label>
               <Input
                 id="zipCode"
                 value={locationData.zipCode}
                 onChange={(e) => handleInputChange('zipCode', e.target.value)}
                 placeholder="ZIP Code"
+                className="border-2 border-purple-200 focus:border-purple-400 rounded-lg"
                 required
               />
             </div>
@@ -247,8 +253,8 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         </div>
 
         {position && (
-          <div className="text-sm text-gray-600">
-            <p>Coordinates: {position.lat.toFixed(6)}, {position.lng.toFixed(6)}</p>
+          <div className="text-sm text-purple-600 bg-purple-100 p-3 rounded-lg">
+            <p>📍 Coordinates: {position.lat.toFixed(6)}, {position.lng.toFixed(6)}</p>
           </div>
         )}
 
@@ -256,9 +262,9 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
           type="button"
           onClick={handleConfirmLocation}
           disabled={!position || !locationData.address || !locationData.city || !locationData.state}
-          className="w-full"
+          className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-3 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300"
         >
-          Confirm Location
+          ✨ Confirm Location
         </Button>
       </CardContent>
     </Card>

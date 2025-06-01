@@ -1,63 +1,35 @@
 
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { User, AuthState } from '../types';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { apiService } from '../services/api';
+import { User } from '../types';
 
-type AuthAction =
-  | { type: 'LOGIN_SUCCESS'; payload: { user: User; token: string } }
-  | { type: 'LOGOUT' }
-  | { type: 'SET_LOADING'; payload: boolean };
-
-interface AuthContextType extends AuthState {
+interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (userData: {
     email: string;
     password: string;
     firstName: string;
     lastName: string;
-    confirmPassword: string;
   }) => Promise<void>;
   logout: () => void;
-  isLoading: boolean;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const authReducer = (state: AuthState & { isLoading: boolean }, action: AuthAction) => {
-  switch (action.type) {
-    case 'LOGIN_SUCCESS':
-      return {
-        ...state,
-        user: action.payload.user,
-        token: action.payload.token,
-        isAuthenticated: true,
-        isLoading: false,
-      };
-    case 'LOGOUT':
-      return {
-        ...state,
-        user: null,
-        token: null,
-        isAuthenticated: false,
-        isLoading: false,
-      };
-    case 'SET_LOADING':
-      return {
-        ...state,
-        isLoading: action.payload,
-      };
-    default:
-      return state;
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
   }
+  return context;
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [state, dispatch] = useReducer(authReducer, {
-    user: null,
-    token: null,
-    isAuthenticated: false,
-    isLoading: true,
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -65,34 +37,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     if (token && userData) {
       try {
-        const user = JSON.parse(userData);
-        console.log('Restoring user session:', { user, token });
-        dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token } });
+        setUser(JSON.parse(userData));
       } catch (error) {
-        console.error('Error parsing stored user data:', error);
+        console.error('Error parsing user data:', error);
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        dispatch({ type: 'SET_LOADING', payload: false });
       }
-    } else {
-      dispatch({ type: 'SET_LOADING', payload: false });
     }
+    setLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
-    dispatch({ type: 'SET_LOADING', payload: true });
     try {
       const response = await apiService.login({ email, password });
-      console.log('Login response:', response);
       
-      // Handle direct response structure
-      const { user, token } = response.data;
+      // Handle the nested data structure
+      const userData = response.data?.user || response.user;
+      const token = response.data?.token || response.token;
       
+      if (!userData || !token) {
+        throw new Error('Invalid response format');
+      }
+
       localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token } });
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
     } catch (error) {
-      dispatch({ type: 'SET_LOADING', payload: false });
+      console.error('Login error:', error);
       throw error;
     }
   };
@@ -103,19 +74,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     firstName: string;
     lastName: string;
   }) => {
-    dispatch({ type: 'SET_LOADING', payload: true });
     try {
       const response = await apiService.register(userData);
-      console.log('Register response:', response);
-      
-      // Handle direct response structure
-      const { user, token } = response.data;
+      const { user: newUser, token } = response;
       
       localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token } });
+      localStorage.setItem('user', JSON.stringify(newUser));
+      setUser(newUser);
     } catch (error) {
-      dispatch({ type: 'SET_LOADING', payload: false });
+      console.error('Registration error:', error);
       throw error;
     }
   };
@@ -123,27 +90,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    dispatch({ type: 'LOGOUT' });
+    setUser(null);
   };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        ...state,
-        login,
-        register,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
-};
+  const value = {
+    user,
+    isAuthenticated: !!user,
+    login,
+    register,
+    logout,
+    loading,
+  };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

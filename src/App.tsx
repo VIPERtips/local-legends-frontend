@@ -26,11 +26,10 @@ const App = () => (
     <TooltipProvider>
       <AuthProvider>
         <BrowserRouter>
-         <ScrollToTop/>
-          <div className="min-h-screen bg-appBg">
+          <ScrollToTop/>
+          <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50">
             <Navbar />
             <Routes>
-             
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
