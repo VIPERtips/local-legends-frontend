@@ -22,14 +22,15 @@ export interface Business {
   website?: string;
   averageRating: number;
   reviewCount: number;
+  latitude?: number;
+  longitude?: number;
   createdAt: string;
   updatedAt: string;
-  
 }
 
 export interface Review {
   user: {
-    name:string;
+    name: string;
   };
   id: number;
   businessId: number;

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -65,7 +64,6 @@ const RegisterPage: React.FC = () => {
         lastName: formData.lastName,
         email: formData.email,
         password: formData.password,
-        confirmPassword: formData.confirmPassword
       });
       toast({
         title: "Success",
@@ -73,7 +71,6 @@ const RegisterPage: React.FC = () => {
       });
       navigate('/businesses');
     } catch (error) {
-      
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Registration failed",
@@ -142,19 +139,6 @@ const RegisterPage: React.FC = () => {
                 value={formData.password}
                 onChange={handleInputChange}
                 placeholder="Create a password"
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                placeholder="Confirm your password"
                 required
               />
             </div>

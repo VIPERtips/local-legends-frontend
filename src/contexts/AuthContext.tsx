@@ -15,6 +15,7 @@ interface AuthContextType {
   }) => Promise<void>;
   logout: () => void;
   loading: boolean;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -100,6 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     register,
     logout,
     loading,
+    isLoading: loading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
