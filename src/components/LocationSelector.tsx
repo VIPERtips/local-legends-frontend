@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import { Button } from '@/components/ui/button';
@@ -5,8 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { LatLngExpression } from 'leaflet';
-
 
 // Fix for default markers
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -145,8 +144,6 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
     }
   };
 
-  const center: LatLngExpression = [selectedLocation.lat, selectedLocation.lng];
-
   return (
     <div className="space-y-4">
       <div>
@@ -177,12 +174,9 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
 
       <div className="border rounded-lg overflow-hidden">
         <MapContainer
-          center={center}
+          center={[selectedLocation.lat, selectedLocation.lng]}
           zoom={13}
           style={{ height: '300px', width: '100%' }}
-          whenCreated={(map) => {
-            // Handle any map initialization if needed
-          }}
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

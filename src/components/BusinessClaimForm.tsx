@@ -1,13 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { apiService } from '../services/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import LoadingSpinner from './LoadingSpinner';
-import { Building2, Shield, CheckCircle } from 'lucide-react';
+import { Building2, Shield, CheckCircle, Clock, XCircle } from 'lucide-react';
 
 interface BusinessClaimFormProps {
   businessId: number;
@@ -23,7 +24,26 @@ const BusinessClaimForm: React.FC<BusinessClaimFormProps> = ({
   const [evidence, setEvidence] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [claimed, setClaimed] = useState(false);
+  const [existingClaim, setExistingClaim] = useState<any>(null);
+  const [loadingClaims, setLoadingClaims] = useState(true);
   const { toast } = useToast();
+
+  useEffect(() => {
+    fetchExistingClaims();
+  }, [businessId]);
+
+  const fetchExistingClaims = async () => {
+    try {
+      setLoadingClaims(true);
+      const claims = await apiService.getClaims();
+      const businessClaim = claims.find((claim: any) => claim.businessId === businessId);
+      setExistingClaim(businessClaim);
+    } catch (error) {
+      console.error('Error fetching claims:', error);
+    } finally {
+      setLoadingClaims(false);
+    }
+  };
 
   const handleSubmitClaim = async () => {
     if (!evidence.trim()) {
@@ -44,6 +64,7 @@ const BusinessClaimForm: React.FC<BusinessClaimFormProps> = ({
       });
       setClaimed(true);
       setEvidence('');
+      fetchExistingClaims();
       onClaimSubmitted?.();
     } catch (error) {
       toast({
@@ -55,6 +76,111 @@ const BusinessClaimForm: React.FC<BusinessClaimFormProps> = ({
       setSubmitting(false);
     }
   };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'APPROVED':
+        return (
+          <Badge className="bg-green-100 text-green-800 border-green-200">
+            <CheckCircle className="h-4 w-4 mr-1" />
+            Approved
+          </Badge>
+        );
+      case 'REJECTED':
+        return (
+          <Badge className="bg-red-100 text-red-800 border-red-200">
+            <XCircle className="h-4 w-4 mr-1" />
+            Rejected
+          </Badge>
+        );
+      case 'PENDING':
+        return (
+          <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">
+            <Clock className="h-4 w-4 mr-1" />
+            Under Review
+          </Badge>
+        );
+      default:
+        return null;
+    }
+  };
+
+  if (loadingClaims) {
+    return (
+      <Card className="border-0 shadow-xl bg-gradient-to-br from-blue-50 to-purple-50">
+        <CardContent className="p-8 text-center">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-gray-600">Checking claim status...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Show existing claim status
+  if (existingClaim) {
+    return (
+      <Card className="border-0 shadow-xl bg-gradient-to-br from-blue-50 to-purple-50">
+        <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg">
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <Shield className="h-6 w-6" />
+              </div>
+              <span className="text-xl">Business Claim Status</span>
+            </div>
+            {getStatusBadge(existingClaim.status)}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="space-y-4">
+            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+              <div className="flex items-start">
+                <Building2 className="h-5 w-5 text-blue-600 mt-0.5 mr-3" />
+                <div>
+                  <p className="text-blue-800 font-medium">
+                    Your claim for <span className="font-bold">{businessName}</span>
+                  </p>
+                  <p className="text-blue-700 text-sm mt-1">
+                    Status: <strong>{existingClaim.status}</strong>
+                  </p>
+                  <p className="text-blue-600 text-xs mt-2">
+                    Submitted: {new Date(existingClaim.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {existingClaim.status === 'PENDING' && (
+              <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                <p className="text-yellow-800">
+                  <strong>⏰ Under Review:</strong> Your claim is being processed by our team. 
+                  You will be notified once the review is complete.
+                </p>
+              </div>
+            )}
+
+            {existingClaim.status === 'APPROVED' && (
+              <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
+                <p className="text-green-800">
+                  <strong>🎉 Congratulations!</strong> Your business claim has been approved. 
+                  You can now manage your business profile.
+                </p>
+              </div>
+            )}
+
+            {existingClaim.status === 'REJECTED' && (
+              <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
+                <p className="text-red-800">
+                  <strong>❌ Claim Rejected:</strong> Your claim was not approved. 
+                  Please contact support if you believe this is an error.
+                </p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (claimed) {
     return (
