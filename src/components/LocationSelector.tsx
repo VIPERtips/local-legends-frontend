@@ -143,7 +143,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
 
       <div className="border rounded-lg overflow-hidden">
         <MapContainer
-          center={[selectedLocation.lat, selectedLocation.lng]}
+          center={[selectedLocation.lat, selectedLocation.lng] as [number, number]}
           zoom={13}
           style={{ height: '300px', width: '100%' }}
         >
@@ -151,7 +151,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          <Marker position={[selectedLocation.lat, selectedLocation.lng]} />
+          <Marker position={[selectedLocation.lat, selectedLocation.lng] as [number, number]} />
           <MapEvents />
         </MapContainer>
       </div>
