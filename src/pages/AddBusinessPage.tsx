@@ -54,16 +54,16 @@ const AddBusinessPage: React.FC = () => {
     lat: number;
     lng: number;
     address: string;
-    city: string;
-    state: string;
-    zipCode: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
   }) => {
     setFormData({
       ...formData,
       address: location.address,
-      city: location.city,
-      state: location.state,
-      zipCode: location.zipCode,
+      city: location.city || '',
+      state: location.state || '',
+      zipCode: location.zipCode || '',
     });
     setLocationSelected(true);
     toast({

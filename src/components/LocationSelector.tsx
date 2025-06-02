@@ -1,12 +1,11 @@
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, AttributionControl, useMapEvents, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import type { MapOptions } from 'leaflet';
-
 
 // Fix for default markers
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -17,7 +16,7 @@ L.Icon.Default.mergeOptions({
 });
 
 interface LocationSelectorProps {
-  onLocationSelect: (location: { lat: number; lng: number; address: string }) => void;
+  onLocationSelect: (location: { lat: number; lng: number; address: string; city?: string; state?: string; zipCode?: string }) => void;
   initialLocation?: { lat: number; lng: number };
 }
 
@@ -71,22 +70,32 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
     }
   }, []);
 
+  const parseAddressComponents = (data: any) => {
+    const address = data.address || {};
+    return {
+      address: data.display_name || '',
+      city: address.city || address.town || address.village || '',
+      state: address.state || '',
+      zipCode: address.postcode || ''
+    };
+  };
+
   const geocode = useCallback(async (searchAddress: string) => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}&limit=1`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}&limit=1&addressdetails=1`
       );
       const data = await response.json();
       
       if (data && data.length > 0) {
         const lat = parseFloat(data[0].lat);
         const lng = parseFloat(data[0].lon);
-        const formattedAddress = data[0].display_name;
+        const addressComponents = parseAddressComponents(data[0]);
         
         setSelectedLocation({ lat, lng });
-        setAddress(formattedAddress);
-        onLocationSelect({ lat, lng, address: formattedAddress });
+        setAddress(addressComponents.address);
+        onLocationSelect({ lat, lng, ...addressComponents });
         
         // Update map view to new location
         if (mapRef.current) {
@@ -107,16 +116,29 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         async (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          const geocodedAddress = await reverseGeocode(lat, lng);
           
-          setSelectedLocation({ lat, lng });
-          setAddress(geocodedAddress);
-          onLocationSelect({ lat, lng, address: geocodedAddress });
-          
-          // Update map view to current location
-          if (mapRef.current) {
-            mapRef.current.setView([lat, lng], 13);
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`
+            );
+            const data = await response.json();
+            const addressComponents = parseAddressComponents(data);
+            
+            setSelectedLocation({ lat, lng });
+            setAddress(addressComponents.address);
+            onLocationSelect({ lat, lng, ...addressComponents });
+            
+            // Update map view to current location
+            if (mapRef.current) {
+              mapRef.current.setView([lat, lng], 13);
+            }
+          } catch (error) {
+            console.error('Reverse geocoding failed:', error);
+            const fallbackAddress = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            setAddress(fallbackAddress);
+            onLocationSelect({ lat, lng, address: fallbackAddress });
           }
+          
           setLoading(false);
         },
         (error) => {
@@ -125,7 +147,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         }
       );
     }
-  }, [reverseGeocode, onLocationSelect]);
+  }, [onLocationSelect]);
 
   const handleAddressSubmit = useCallback(() => {
     if (address.trim()) {
@@ -150,48 +172,28 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
     }
   };
 
-  // Handle map click events directly through the map instance
-  const handleMapCreated = (map: L.Map) => {
-    mapRef.current = map;
-    
-    // Add click event listener to the map
-    map.on('click', async (e) => {
-      const { lat, lng } = e.latlng;
-      const geocodedAddress = await reverseGeocode(lat, lng);
-      
-      setSelectedLocation({ lat, lng });
-      setAddress(geocodedAddress);
-      onLocationSelect({ lat, lng, address: geocodedAddress });
-    });
-    
-    // Ensure map renders correctly
-    map.invalidateSize();
-  };
-
   // Handle map click
   const handleMapClick = useCallback(
     async (lat: number, lng: number) => {
-      const geocodedAddress = await reverseGeocode(lat, lng);
-      setSelectedLocation({ lat, lng });
-      setAddress(geocodedAddress);
-      onLocationSelect({ lat, lng, address: geocodedAddress });
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`
+        );
+        const data = await response.json();
+        const addressComponents = parseAddressComponents(data);
+        
+        setSelectedLocation({ lat, lng });
+        setAddress(addressComponents.address);
+        onLocationSelect({ lat, lng, ...addressComponents });
+      } catch (error) {
+        console.error('Reverse geocoding failed:', error);
+        const fallbackAddress = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+        setAddress(fallbackAddress);
+        onLocationSelect({ lat, lng, address: fallbackAddress });
+      }
     },
-    [reverseGeocode, onLocationSelect]
+    [onLocationSelect]
   );
-
-  // Update map view when location changes
-  const updateMapView = useCallback(() => {
-    if (mapRef.current) {
-      mapRef.current.setView(
-        [selectedLocation.lat, selectedLocation.lng],
-        13
-      );
-    }
-  }, [selectedLocation]);
-
-  useEffect(() => {
-    updateMapView();
-  }, [selectedLocation, updateMapView]);
 
   return (
     <div className="space-y-4">
@@ -222,21 +224,19 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
       </Button>
 
       <div className="border rounded-lg overflow-hidden">
-      <MapContainer
-  {...({
-    
-    center: [selectedLocation.lat, selectedLocation.lng],
-    zoom: 13,
-    style: { height: '300px', width: '100%' },
-    whenCreated: handleMapCreated
-  } as MapOptions)}
->
-
+        <MapContainer
+          center={[selectedLocation.lat, selectedLocation.lng] as L.LatLngExpression}
+          zoom={13}
+          style={{ height: '300px', width: '100%' }}
+        >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-           
           />
-          <Marker position={[selectedLocation.lat, selectedLocation.lng]} />
+          <Marker position={[selectedLocation.lat, selectedLocation.lng] as L.LatLngExpression} />
+          <MapEvents 
+            onMapClick={handleMapClick} 
+            initialLocation={initialLocation} 
+          />
         </MapContainer>
       </div>
 
@@ -250,4 +250,3 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
 };
 
 export default LocationSelector;
-
