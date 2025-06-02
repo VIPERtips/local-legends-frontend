@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import { Button } from '@/components/ui/button';
@@ -143,15 +142,14 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
 
       <div className="border rounded-lg overflow-hidden">
         <MapContainer
-          center={[selectedLocation.lat, selectedLocation.lng] as [number, number]}
+          center={[selectedLocation.lat, selectedLocation.lng]}
           zoom={13}
           style={{ height: '300px', width: '100%' }}
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          <Marker position={[selectedLocation.lat, selectedLocation.lng] as [number, number]} />
+          <Marker position={[selectedLocation.lat, selectedLocation.lng]} />
           <MapEvents />
         </MapContainer>
       </div>
