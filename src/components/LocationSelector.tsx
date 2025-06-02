@@ -1,11 +1,12 @@
-
-import React, { useState, useEffect, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, AttributionControl, useMapEvents, useMap } from 'react-leaflet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import type { MapOptions } from 'leaflet';
+
 
 // Fix for default markers
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -27,17 +28,35 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
   const [selectedLocation, setSelectedLocation] = useState(initialLocation);
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
+  const mapRef = useRef<L.Map | null>(null);
 
-  // Throttle API requests to avoid overloading Nominatim
-  const throttle = (fn: Function, delay: number) => {
-    let lastCall = 0;
-    return (...args: any[]) => {
-      const now = Date.now();
-      if (now - lastCall < delay) return;
-      lastCall = now;
-      return fn(...args);
-    };
-  };
+  function MapEvents({
+    onMapClick,
+    initialLocation,
+  }: {
+    onMapClick: (lat: number, lng: number) => void;
+    initialLocation: { lat: number; lng: number };
+  }) {
+    const map = useMap();
+  
+    useEffect(() => {
+      map.invalidateSize();
+    }, [map]);
+  
+    useMapEvents({
+      click: (e) => {
+        const { lat, lng } = e.latlng;
+        onMapClick(lat, lng);
+      },
+    });
+  
+    // Set initial view
+    useEffect(() => {
+      map.setView([initialLocation.lat, initialLocation.lng], 13);
+    }, [initialLocation, map]);
+  
+    return null;
+  }
 
   const reverseGeocode = useCallback(async (lat: number, lng: number) => {
     try {
@@ -52,7 +71,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
     }
   }, []);
 
-  const geocode = useCallback(throttle(async (searchAddress: string) => {
+  const geocode = useCallback(async (searchAddress: string) => {
     try {
       setLoading(true);
       const response = await fetch(
@@ -68,13 +87,18 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         setSelectedLocation({ lat, lng });
         setAddress(formattedAddress);
         onLocationSelect({ lat, lng, address: formattedAddress });
+        
+        // Update map view to new location
+        if (mapRef.current) {
+          mapRef.current.setView([lat, lng], 13);
+        }
       }
     } catch (error) {
       console.error('Geocoding failed:', error);
     } finally {
       setLoading(false);
     }
-  }, 1000), []); // Throttle to 1 request per second
+  }, [onLocationSelect]);
 
   const getCurrentLocation = useCallback(() => {
     if (navigator.geolocation) {
@@ -88,6 +112,11 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
           setSelectedLocation({ lat, lng });
           setAddress(geocodedAddress);
           onLocationSelect({ lat, lng, address: geocodedAddress });
+          
+          // Update map view to current location
+          if (mapRef.current) {
+            mapRef.current.setView([lat, lng], 13);
+          }
           setLoading(false);
         },
         (error) => {
@@ -97,29 +126,6 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
       );
     }
   }, [reverseGeocode, onLocationSelect]);
-
-  // Map events component
-  const MapEvents = () => {
-    const map = useMap();
-    
-    useMapEvents({
-      click: async (e) => {
-        const { lat, lng } = e.latlng;
-        const geocodedAddress = await reverseGeocode(lat, lng);
-        
-        setSelectedLocation({ lat, lng });
-        setAddress(geocodedAddress);
-        onLocationSelect({ lat, lng, address: geocodedAddress });
-      },
-    });
-    
-    // Fit bounds when map is ready
-    useEffect(() => {
-      map.invalidateSize();
-    }, [map]);
-
-    return null;
-  };
 
   const handleAddressSubmit = useCallback(() => {
     if (address.trim()) {
@@ -143,6 +149,49 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
       handleAddressSubmit();
     }
   };
+
+  // Handle map click events directly through the map instance
+  const handleMapCreated = (map: L.Map) => {
+    mapRef.current = map;
+    
+    // Add click event listener to the map
+    map.on('click', async (e) => {
+      const { lat, lng } = e.latlng;
+      const geocodedAddress = await reverseGeocode(lat, lng);
+      
+      setSelectedLocation({ lat, lng });
+      setAddress(geocodedAddress);
+      onLocationSelect({ lat, lng, address: geocodedAddress });
+    });
+    
+    // Ensure map renders correctly
+    map.invalidateSize();
+  };
+
+  // Handle map click
+  const handleMapClick = useCallback(
+    async (lat: number, lng: number) => {
+      const geocodedAddress = await reverseGeocode(lat, lng);
+      setSelectedLocation({ lat, lng });
+      setAddress(geocodedAddress);
+      onLocationSelect({ lat, lng, address: geocodedAddress });
+    },
+    [reverseGeocode, onLocationSelect]
+  );
+
+  // Update map view when location changes
+  const updateMapView = useCallback(() => {
+    if (mapRef.current) {
+      mapRef.current.setView(
+        [selectedLocation.lat, selectedLocation.lng],
+        13
+      );
+    }
+  }, [selectedLocation]);
+
+  useEffect(() => {
+    updateMapView();
+  }, [selectedLocation, updateMapView]);
 
   return (
     <div className="space-y-4">
@@ -173,17 +222,21 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
       </Button>
 
       <div className="border rounded-lg overflow-hidden">
-        <MapContainer
-          center={[selectedLocation.lat, selectedLocation.lng]}
-          zoom={13}
-          style={{ height: '300px', width: '100%' }}
-        >
+      <MapContainer
+  {...({
+    
+    center: [selectedLocation.lat, selectedLocation.lng],
+    zoom: 13,
+    style: { height: '300px', width: '100%' },
+    whenCreated: handleMapCreated
+  } as MapOptions)}
+>
+
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+           
           />
           <Marker position={[selectedLocation.lat, selectedLocation.lng]} />
-          <MapEvents />
         </MapContainer>
       </div>
 
@@ -197,3 +250,4 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
 };
 
 export default LocationSelector;
+

@@ -26,6 +26,7 @@ export interface Business {
   longitude?: number;
   createdAt: string;
   updatedAt: string;
+  content?: any;
 }
 
 export interface Review {

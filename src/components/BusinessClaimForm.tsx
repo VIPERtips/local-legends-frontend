@@ -36,7 +36,8 @@ const BusinessClaimForm: React.FC<BusinessClaimFormProps> = ({
     try {
       setLoadingClaims(true);
       const claims = await apiService.getClaims();
-      const businessClaim = claims.find((claim: any) => claim.businessId === businessId);
+      const businessClaim = claims?.data?.content?.find((claim: any) => claim.id === businessId);
+      console.log(businessClaim)
       setExistingClaim(businessClaim);
     } catch (error) {
       console.error('Error fetching claims:', error);
@@ -76,6 +77,7 @@ const BusinessClaimForm: React.FC<BusinessClaimFormProps> = ({
       setSubmitting(false);
     }
   };
+
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -144,7 +146,7 @@ const BusinessClaimForm: React.FC<BusinessClaimFormProps> = ({
                     Status: <strong>{existingClaim.status}</strong>
                   </p>
                   <p className="text-blue-600 text-xs mt-2">
-                    Submitted: {new Date(existingClaim.createdAt).toLocaleDateString()}
+                    Submitted: {new Date(existingClaim.submittedAt).toLocaleDateString()}
                   </p>
                 </div>
               </div>
