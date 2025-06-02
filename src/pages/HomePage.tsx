@@ -93,7 +93,7 @@ const HomePage: React.FC = () => {
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
                 <Link to="/register">
                   <Button size="lg" className="bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-black font-bold text-lg px-8 py-4 rounded-xl shadow-2xl transform hover:scale-105 transition-all duration-300">
-                    🚀 Get Started
+                    Get Started
                   </Button>
                 </Link>
                 <Link to="/login">
@@ -118,7 +118,7 @@ const HomePage: React.FC = () => {
               <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform duration-300">
                 <Search className="w-10 h-10 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">🔍 Discover</h3>
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">Discover</h3>
               <p className="text-gray-600 text-lg leading-relaxed">
                 Find amazing local businesses with powerful search and filtering options tailored to your location.
               </p>
@@ -128,7 +128,7 @@ const HomePage: React.FC = () => {
               <div className="w-20 h-20 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform duration-300">
                 <Star className="w-10 h-10 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">⭐ Review</h3>
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">Review</h3>
               <p className="text-gray-600 text-lg leading-relaxed">
                 Share your experiences and help others make informed decisions with detailed reviews.
               </p>
@@ -138,7 +138,7 @@ const HomePage: React.FC = () => {
               <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform duration-300">
                 <Award className="w-10 h-10 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">🤝 Connect</h3>
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">Connect</h3>
               <p className="text-gray-600 text-lg leading-relaxed">
                 Build stronger connections between businesses and their communities for mutual growth.
               </p>
