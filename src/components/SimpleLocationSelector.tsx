@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { MapPin, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-interface LocationSelectorProps {
+interface SimpleLocationSelectorProps {
   onLocationSelect: (location: { lat: number; lng: number; address: string; city?: string; state?: string; zipCode?: string }) => void;
   initialLocation?: { lat: number; lng: number };
 }
@@ -22,7 +22,7 @@ const US_STATES = [
   'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
 ];
 
-const LocationSelector: React.FC<LocationSelectorProps> = ({
+const SimpleLocationSelector: React.FC<SimpleLocationSelectorProps> = ({
   onLocationSelect,
   initialLocation
 }) => {
@@ -120,51 +120,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
       'Florida': { lat: 27.7663, lng: -81.6868 },
       'New York': { lat: 42.1657, lng: -74.9481 },
       'Pennsylvania': { lat: 41.2033, lng: -77.1945 },
-      'Illinois': { lat: 40.3363, lng: -89.0022 },
-      'Ohio': { lat: 40.3888, lng: -82.7649 },
-      'Georgia': { lat: 33.76, lng: -84.39 },
-      'North Carolina': { lat: 35.771, lng: -78.638 },
-      'Michigan': { lat: 43.3266, lng: -84.5361 },
-      'New Jersey': { lat: 40.314, lng: -74.5089 },
-      'Virginia': { lat: 37.768, lng: -78.2057 },
-      'Washington': { lat: 47.042, lng: -122.893 },
-      'Arizona': { lat: 33.729, lng: -111.431 },
-      'Massachusetts': { lat: 42.2352, lng: -71.0275 },
-      'Tennessee': { lat: 35.747, lng: -86.7821 },
-      'Indiana': { lat: 39.790, lng: -86.147 },
-      'Missouri': { lat: 38.572, lng: -92.189 },
-      'Maryland': { lat: 39.05, lng: -76.542 },
-      'Wisconsin': { lat: 44.26, lng: -89.616 },
-      'Colorado': { lat: 39.550, lng: -105.782 },
-      'Minnesota': { lat: 45.694, lng: -93.900 },
-      'South Carolina': { lat: 33.836, lng: -81.163 },
-      'Alabama': { lat: 32.361, lng: -86.279 },
-      'Louisiana': { lat: 31.169, lng: -91.867 },
-      'Kentucky': { lat: 37.669, lng: -84.670 },
-      'Oregon': { lat: 44.931, lng: -123.029 },
-      'Oklahoma': { lat: 35.482, lng: -97.535 },
-      'Connecticut': { lat: 41.767, lng: -72.677 },
-      'Utah': { lat: 39.320, lng: -111.093 },
-      'Iowa': { lat: 42.011, lng: -93.210 },
-      'Nevada': { lat: 38.313, lng: -117.055 },
-      'Arkansas': { lat: 34.736, lng: -92.331 },
-      'Mississippi': { lat: 32.320, lng: -90.207 },
-      'Kansas': { lat: 38.526, lng: -96.726 },
-      'New Mexico': { lat: 34.840, lng: -106.248 },
-      'Nebraska': { lat: 41.590, lng: -99.901 },
-      'West Virginia': { lat: 38.349, lng: -81.633 },
-      'Idaho': { lat: 44.240, lng: -114.478 },
-      'Hawaii': { lat: 21.094, lng: -157.498 },
-      'New Hampshire': { lat: 43.452, lng: -71.563 },
-      'Maine': { lat: 44.323, lng: -69.765 },
-      'Montana': { lat: 47.052, lng: -109.633 },
-      'Rhode Island': { lat: 41.680, lng: -71.511 },
-      'Delaware': { lat: 39.318, lng: -75.507 },
-      'South Dakota': { lat: 44.299, lng: -99.438 },
-      'North Dakota': { lat: 47.528, lng: -99.784 },
-      'Alaska': { lat: 61.370, lng: -152.404 },
-      'Vermont': { lat: 44.045, lng: -72.710 },
-      'Wyoming': { lat: 42.755, lng: -107.302 }
+      // Add more states as needed, using state centers
     };
 
     const coords = stateCoordinates[state] || { lat: 39.8283, lng: -98.5795 }; // Default to US center
@@ -293,4 +249,4 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
   );
 };
 
-export default LocationSelector;
+export default SimpleLocationSelector;
