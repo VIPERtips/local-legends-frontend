@@ -13,7 +13,23 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import BusinessClaimForm from '../components/BusinessClaimForm';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '../contexts/AuthContext';
-import { MapPin, Phone, Mail, Globe, Star, Award, Clock } from 'lucide-react';
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Globe,
+  Star,
+  Award,
+  Clock,
+  Stethoscope,
+  Coffee,
+  ShoppingBag,
+  Wrench,
+  Film,
+  Truck,
+  Lollipop,
+  Dumbbell,
+} from 'lucide-react'
 
 const BusinessDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -42,11 +58,11 @@ const BusinessDetailPage: React.FC = () => {
         apiService.getBusinessReviews(Number(id)),
       ]);
       
-      console.log('Business response:', businessResponse);
-      console.log('Reviews response:', reviewsResponse);
+      console.log('Business response:', businessResponse.data);
+      console.log('Reviews response:', reviewsResponse.data.content);
       
-      setBusiness(businessResponse);
-      setReviews(Array.isArray(reviewsResponse) ? reviewsResponse : []);
+      setBusiness(businessResponse.data);
+      setReviews(Array.isArray(reviewsResponse.data.content) ? reviewsResponse.data.content : []);
     } catch (error) {
       console.error('Error fetching business details:', error);
       toast({
@@ -98,18 +114,45 @@ const BusinessDetailPage: React.FC = () => {
   };
 
   const getCategoryTheme = (category: string) => {
-    const themes = {
-      'Healthcare': { gradient: 'from-blue-500 to-cyan-400', icon: '🏥' },
-      'Restaurant': { gradient: 'from-orange-500 to-red-400', icon: '🍕' },
-      'Retail': { gradient: 'from-green-500 to-emerald-400', icon: '🛍️' },
-      'Services': { gradient: 'from-purple-500 to-indigo-400', icon: '🔧' },
-      'Entertainment': { gradient: 'from-pink-500 to-rose-400', icon: '🎪' },
-      'Automotive': { gradient: 'from-gray-500 to-slate-400', icon: '🚗' },
-      'Beauty': { gradient: 'from-rose-500 to-pink-400', icon: '💄' },
-      'Fitness': { gradient: 'from-teal-500 to-green-400', icon: '💪' }
-    };
-    return themes[category as keyof typeof themes] || themes['Services'];
-  };
+    const themes: Record<
+      string,
+      { gradient: string; icon: React.ReactNode }
+    > = {
+      Healthcare: {
+        gradient: 'from-blue-500 to-cyan-400',
+        icon: <Stethoscope className="h-8 w-8 text-blue-600" />,
+      },
+      Restaurant: {
+        gradient: 'from-orange-500 to-red-400',
+        icon: <Coffee className="h-8 w-8 text-orange-600" />,
+      },
+      Retail: {
+        gradient: 'from-green-500 to-emerald-400',
+        icon: <ShoppingBag className="h-8 w-8 text-green-600" />,
+      },
+      Services: {
+        gradient: 'from-purple-500 to-indigo-400',
+        icon: <Wrench className="h-8 w-8 text-purple-600" />,
+      },
+      Entertainment: {
+        gradient: 'from-pink-500 to-rose-400',
+        icon: <Film className="h-8 w-8 text-pink-600" />,
+      },
+      Automotive: {
+        gradient: 'from-gray-500 to-slate-400',
+        icon: <Truck className="h-8 w-8 text-gray-600" />,
+      },
+      Beauty: {
+        gradient: 'from-rose-500 to-pink-400',
+        icon: <Lollipop className="h-8 w-8 text-rose-600" />,
+      },
+      Fitness: {
+        gradient: 'from-teal-500 to-green-400',
+        icon: <Dumbbell className="h-8 w-8 text-teal-600" />,
+      },
+    }
+    return themes[category] || themes['Services']
+  }
 
   if (loading) {
     return (

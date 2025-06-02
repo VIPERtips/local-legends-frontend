@@ -12,6 +12,7 @@ interface AuthContextType {
     password: string;
     firstName: string;
     lastName: string;
+    confirmPassword:string;
   }) => Promise<void>;
   logout: () => void;
   loading: boolean;
@@ -31,6 +32,7 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -50,6 +52,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     try {
+      setLoading(true);
       const response = await apiService.login({ email, password });
       
       // Handle the nested data structure
@@ -66,6 +69,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Login error:', error);
       throw error;
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -74,10 +79,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     password: string;
     firstName: string;
     lastName: string;
+    confirmPassword: string;
   }) => {
     try {
+      setLoading(true);
       const response = await apiService.register(userData);
-      const { user: newUser, token } = response;
+      const newUser = response.data?.user || response.user;
+      const token = response.data?.token || response.token;
+      
       
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(newUser));
@@ -85,6 +94,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
+    }finally{
+      setLoading(false);
     }
   };
 

@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import React, { useState, useEffect, useCallback } from 'react';
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { LatLngExpression } from 'leaflet';
+
 
 // Fix for default markers
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -27,7 +29,18 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const reverseGeocode = async (lat: number, lng: number) => {
+  // Throttle API requests to avoid overloading Nominatim
+  const throttle = (fn: Function, delay: number) => {
+    let lastCall = 0;
+    return (...args: any[]) => {
+      const now = Date.now();
+      if (now - lastCall < delay) return;
+      lastCall = now;
+      return fn(...args);
+    };
+  };
+
+  const reverseGeocode = useCallback(async (lat: number, lng: number) => {
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`
@@ -38,9 +51,9 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
       console.error('Reverse geocoding failed:', error);
       return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
     }
-  };
+  }, []);
 
-  const geocode = async (searchAddress: string) => {
+  const geocode = useCallback(throttle(async (searchAddress: string) => {
     try {
       setLoading(true);
       const response = await fetch(
@@ -62,9 +75,9 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, 1000), []); // Throttle to 1 request per second
 
-  const getCurrentLocation = () => {
+  const getCurrentLocation = useCallback(() => {
     if (navigator.geolocation) {
       setLoading(true);
       navigator.geolocation.getCurrentPosition(
@@ -84,9 +97,12 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         }
       );
     }
-  };
+  }, [reverseGeocode, onLocationSelect]);
 
+  // Map events component
   const MapEvents = () => {
+    const map = useMap();
+    
     useMapEvents({
       click: async (e) => {
         const { lat, lng } = e.latlng;
@@ -97,43 +113,62 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         onLocationSelect({ lat, lng, address: geocodedAddress });
       },
     });
+    
+    // Fit bounds when map is ready
+    useEffect(() => {
+      map.invalidateSize();
+    }, [map]);
+
     return null;
   };
 
-  const handleAddressSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAddressSubmit = useCallback(() => {
     if (address.trim()) {
       geocode(address.trim());
     }
-  };
+  }, [address, geocode]);
 
   useEffect(() => {
     const initializeAddress = async () => {
-      if (initialLocation && !address) {
+      if (initialLocation) {
         const geocodedAddress = await reverseGeocode(initialLocation.lat, initialLocation.lng);
         setAddress(geocodedAddress);
       }
     };
     initializeAddress();
-  }, [initialLocation, address]);
+  }, [initialLocation, reverseGeocode]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddressSubmit();
+    }
+  };
+
+  const center: LatLngExpression = [selectedLocation.lat, selectedLocation.lng];
 
   return (
     <div className="space-y-4">
       <div>
         <Label htmlFor="address-search">Search for an address</Label>
-        <form onSubmit={handleAddressSubmit} className="flex space-x-2 mt-2">
+        <div className="flex space-x-2 mt-2">
           <Input
             id="address-search"
             type="text"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="Enter address or city"
             className="flex-1"
           />
-          <Button type="submit" disabled={loading}>
+          <Button 
+            type="button" 
+            onClick={handleAddressSubmit} 
+            disabled={loading}
+          >
             {loading ? 'Searching...' : 'Search'}
           </Button>
-        </form>
+        </div>
       </div>
 
       <Button onClick={getCurrentLocation} disabled={loading} className="w-full">
@@ -142,14 +177,18 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
 
       <div className="border rounded-lg overflow-hidden">
         <MapContainer
-          center={[selectedLocation.lat, selectedLocation.lng] as L.LatLngExpression}
+          center={center}
           zoom={13}
           style={{ height: '300px', width: '100%' }}
+          whenCreated={(map) => {
+            // Handle any map initialization if needed
+          }}
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          <Marker position={[selectedLocation.lat, selectedLocation.lng] as L.LatLngExpression} />
+          <Marker position={[selectedLocation.lat, selectedLocation.lng]} />
           <MapEvents />
         </MapContainer>
       </div>

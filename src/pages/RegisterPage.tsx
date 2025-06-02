@@ -64,6 +64,7 @@ const RegisterPage: React.FC = () => {
         lastName: formData.lastName,
         email: formData.email,
         password: formData.password,
+        confirmPassword: formData.confirmPassword,
       });
       toast({
         title: "Success",
@@ -130,7 +131,8 @@ const RegisterPage: React.FC = () => {
               />
             </div>
             
-            <div>
+           <div className="grid grid-cols-2 gap-4">
+           <div>
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
@@ -142,6 +144,19 @@ const RegisterPage: React.FC = () => {
                 required
               />
             </div>
+            <div>
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                placeholder="Confirm Password"
+                required
+              />
+            </div>
+           </div>
 
             <Button 
               type="submit" 

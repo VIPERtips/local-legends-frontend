@@ -25,7 +25,9 @@ class ApiService {
     password: string;
     firstName: string;
     lastName: string;
-  }): Promise<{ user: User; token: string }> {
+  }): Promise<{
+    data: { user: any; token: any; }; user: User; token: string 
+}>  {
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
@@ -141,7 +143,7 @@ class ApiService {
     rating: number;
     comment?: string;
   }): Promise<Review> {
-    const response = await fetch(`${API_BASE_URL}/reviews/add/${businessId}`, {
+    const response = await fetch(`${API_BASE_URL}/reviews/${businessId}`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(reviewData),
@@ -167,10 +169,9 @@ class ApiService {
   }
 
   async updateClaimStatus(claimId: number, status: 'APPROVED' | 'REJECTED'): Promise<BusinessClaim> {
-    const response = await fetch(`${API_BASE_URL}/claims/${claimId}/status`, {
+    const response = await fetch(`${API_BASE_URL}/claims/${claimId}?status=${status}`, {
       method: 'PUT',
-      headers: this.getAuthHeaders(),
-      body: JSON.stringify({ status }),
+      headers: this.getAuthHeaders()
     });
     return this.handleResponse(response);
   }

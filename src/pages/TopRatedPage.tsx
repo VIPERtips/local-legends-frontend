@@ -26,9 +26,9 @@ const TopRatedPage: React.FC = () => {
     setLoading(true);
     try {
       const data = await apiService.getTopRatedBusinesses(category);
-      console.log("Top rated businesses response:", data);
+      console.log("Top rated businesses response:", data.content);
       // Handle the correct response structure - data is already the array
-      setBusinesses(Array.isArray(data) ? data : []);
+      setBusinesses(Array.isArray(data.content) ? data.content : []);
     } catch (error) {
       toast({
         title: "Error",

@@ -6,7 +6,7 @@ import StarRating from './StarRating';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Phone, Clock, Star, Award } from 'lucide-react';
+import { MapPin, Phone, Clock, Star, Award, Stethoscope, Coffee, Dumbbell, Film, Lollipop, ShoppingBag, Truck, Wrench } from 'lucide-react';
 
 interface ModernBusinessCardProps {
   business: Business;
@@ -15,59 +15,55 @@ interface ModernBusinessCardProps {
 }
 
 const getCategoryTheme = (category: string) => {
-  const themes = {
-    'Healthcare': {
-      gradient: 'from-blue-500 to-cyan-400',
-      bgGradient: 'from-blue-50 to-cyan-50',
-      icon: '🏥',
-      color: 'text-blue-600'
+  const themes: Record<
+    string,
+    { bgGradient: string; color: string; icon: React.ReactNode }
+  > = {
+    Healthcare: {
+      bgGradient: 'from-blue-500 to-cyan-400',
+      color: 'text-blue-600',
+      icon: <Stethoscope className="h-8 w-8 text-blue-600" />,
     },
-    'Restaurant': {
-      gradient: 'from-orange-500 to-red-400',
-      bgGradient: 'from-orange-50 to-red-50',
-      icon: '🍕',
-      color: 'text-orange-600'
+    Restaurant: {
+      bgGradient: 'from-orange-500 to-red-400',
+      color: 'text-orange-600',
+      icon: <Coffee className="h-8 w-8 text-orange-600" />,
     },
-    'Retail': {
-      gradient: 'from-green-500 to-emerald-400',
-      bgGradient: 'from-green-50 to-emerald-50',
-      icon: '🛍️',
-      color: 'text-green-600'
+    Retail: {
+      bgGradient: 'from-green-500 to-emerald-400',
+      color: 'text-green-600',
+      icon: <ShoppingBag className="h-8 w-8 text-green-600" />,
     },
-    'Services': {
-      gradient: 'from-purple-500 to-indigo-400',
-      bgGradient: 'from-purple-50 to-indigo-50',
-      icon: '🔧',
-      color: 'text-purple-600'
+    Services: {
+      bgGradient: 'from-purple-500 to-indigo-400',
+      color: 'text-purple-600',
+      icon: <Wrench className="h-8 w-8 text-purple-600" />,
     },
-    'Entertainment': {
-      gradient: 'from-pink-500 to-rose-400',
-      bgGradient: 'from-pink-50 to-rose-50',
-      icon: '🎪',
-      color: 'text-pink-600'
+    Entertainment: {
+      bgGradient: 'from-pink-500 to-rose-400',
+      color: 'text-pink-600',
+      icon: <Film className="h-8 w-8 text-pink-600" />,
     },
-    'Automotive': {
-      gradient: 'from-gray-500 to-slate-400',
-      bgGradient: 'from-gray-50 to-slate-50',
-      icon: '🚗',
-      color: 'text-gray-600'
+    Automotive: {
+      bgGradient: 'from-gray-500 to-slate-400',
+      color: 'text-gray-600',
+      icon: <Truck className="h-8 w-8 text-gray-600" />,
     },
-    'Beauty': {
-      gradient: 'from-rose-500 to-pink-400',
-      bgGradient: 'from-rose-50 to-pink-50',
-      icon: '💄',
-      color: 'text-rose-600'
+    Beauty: {
+      bgGradient: 'from-rose-500 to-pink-400',
+      color: 'text-rose-600',
+      icon: <Lollipop className="h-8 w-8 text-rose-600" />,
     },
-    'Fitness': {
-      gradient: 'from-teal-500 to-green-400',
-      bgGradient: 'from-teal-50 to-green-50',
-      icon: '💪',
-      color: 'text-teal-600'
-    }
+    Fitness: {
+      bgGradient: 'from-teal-500 to-green-400',
+      color: 'text-teal-600',
+      icon: <Dumbbell className="h-8 w-8 text-teal-600" />,
+    },
   };
-  
-  return themes[category as keyof typeof themes] || themes['Services'];
+  return themes[category] || themes['Services'];
 };
+
+
 
 const calculateDistance = (
   lat1: number, 
@@ -106,7 +102,7 @@ const ModernBusinessCard: React.FC<ModernBusinessCardProps> = ({
   return (
     <Card className={`group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 bg-gradient-to-br ${theme.bgGradient}`}>
       {/* Gradient Header */}
-      <div className={`h-2 bg-gradient-to-r ${theme.gradient}`} />
+      <div className={`h-2 bg-gradient-to-r ${theme.bgGradient}`} />
       
       {/* Status Badges */}
       <div className="absolute top-4 right-4 flex flex-col gap-2">
@@ -181,7 +177,7 @@ const ModernBusinessCard: React.FC<ModernBusinessCardProps> = ({
         <div className="flex gap-2 mt-4">
           <Button 
             size="sm" 
-            className={`flex-1 bg-gradient-to-r ${theme.gradient} hover:opacity-90 text-white border-0 shadow-md`}
+            className={`flex-1 bg-gradient-to-r ${theme.bgGradient} hover:opacity-90 text-white border-0 shadow-md`}
             asChild
           >
             <Link to={`/businesses/${business.id}`}>

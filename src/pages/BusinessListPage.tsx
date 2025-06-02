@@ -60,10 +60,10 @@ const BusinessListPage: React.FC = () => {
         response = await apiService.getBusinesses(page, 12);
       }
       
-      console.log("API response:", response);
+      console.log("API response:", response.data);
       
-      const businessData = response.content || [];
-      const totalPagesCount = response.totalPages || 0;
+      const businessData = response.data.content || [];
+      const totalPagesCount = response.data.totalPages || 0;
       
       setBusinesses(Array.isArray(businessData) ? businessData : []);
       setTotalPages(totalPagesCount);

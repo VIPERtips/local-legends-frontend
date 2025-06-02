@@ -16,8 +16,9 @@ const AdminClaimsPage: React.FC = () => {
 
   const fetchClaims = async () => {
     try {
-      const data = await apiService.getClaims();
-      setClaims(data);
+      const response = await apiService.getClaims();
+      console.log("admin",response.data.content)
+      setClaims(response.data.content);
     } catch (error) {
       toast({
         title: "Error",
