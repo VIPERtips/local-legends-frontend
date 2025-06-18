@@ -52,8 +52,8 @@ A modern React application that connects customers with local businesses, featur
 
 ```bash
 # Clone the repository
-git clone <YOUR_GIT_URL>
-cd local-legends-hub
+git clone https://github.com/VIPERtips/local-legends-frontend/
+cd local-legends-frontend
 
 # Install dependencies
 npm install
